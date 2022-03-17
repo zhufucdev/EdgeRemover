@@ -54,7 +54,8 @@ namespace EdgeRemover
                     var desired = File.ReadAllText(ConfigurationPath);
                     var process = new ProcessStartInfo()
                     {
-                        FileName = ConfigurationPath
+                        FileName = desired,
+                        Arguments = url
                     };
                     Process.Start(process);
                 } 
