@@ -16,12 +16,8 @@ namespace EdgeRemover
     {
         private const string EDGE_PROTOCOL = "microsoft-edge:?";
         private const string IFEO_PATH = @"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\msedge.exe";
-        private const string CONFIGURATION_NAME = "desired_broswer.txt";
 
-        private static string ConfigurationPath
-        {
-            get => Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), CONFIGURATION_NAME);
-        }
+        private static string ConfigurationPath;
 
         static void Main(string[] args)
         {
@@ -49,22 +45,11 @@ namespace EdgeRemover
                     indexEnd = query.Length;
                 }
                 var url = HttpUtility.UrlDecode(query.Substring(index + 4, indexEnd - index - 4));
-                if (File.Exists(ConfigurationPath))
+                var process = new ProcessStartInfo()
                 {
-                    var desired = File.ReadAllText(ConfigurationPath);
-                    var process = new ProcessStartInfo()
-                    {
-                        FileName = desired,
-                        Arguments = url
-                    };
-                    Process.Start(process);
-                } 
-                else
-                {
-                    Console.WriteLine("Error: No defined broswer found.");
-                    Console.WriteLine(string.Format("Write plain text of the path to your broswer executable in {0}", ConfigurationPath));
-                    PreExit();
-                }
+                    FileName = url
+                };
+                Process.Start(process);
             }
         }
 
