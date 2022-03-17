@@ -1,5 +1,5 @@
 # EdgeRemover
-Give you the freedom to choose aside from MicroSoft Edge.
+Give you the freedom to choose aside from Microsoft Edge.
 
 ## Usage
 1. Download from the release tab
