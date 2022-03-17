@@ -20,7 +20,7 @@ namespace EdgeRemover
 
         private static string ConfigurationPath
         {
-            get => Path.Combine(Assembly.GetExecutingAssembly().Location, CONFIGURATION_NAME);
+            get => Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), CONFIGURATION_NAME);
         }
 
         static void Main(string[] args)
@@ -111,11 +111,13 @@ namespace EdgeRemover
             {
                 using (RegistryKey key = Registry.LocalMachine.CreateSubKey(IFEO_PATH))
                 {
-                    key.SetValue("Debug", Assembly.GetExecutingAssembly().Location);
+                    key.SetValue("Debugger", Assembly.GetExecutingAssembly().Location);
                 }
-            } catch (Exception ex)
+            } 
+            catch (Exception ex)
             {
                 Console.WriteLine(ex.ToString());
+                PreExit(1);
             }
             Console.WriteLine("Registration successful.");
             Console.WriteLine(string.Format(@"See Computer\HKEY_LOCAL_MACHINE\{0} for details.", IFEO_PATH));
