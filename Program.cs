@@ -17,8 +17,6 @@ namespace EdgeRemover
         private const string EDGE_PROTOCOL = "microsoft-edge:?";
         private const string IFEO_PATH = @"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\msedge.exe";
 
-        private static string ConfigurationPath;
-
         static void Main(string[] args)
         {
             var query = args.FirstOrDefault(v => v.StartsWith(EDGE_PROTOCOL));
