@@ -16,6 +16,7 @@ namespace EdgeRemover
         private const string IFEO_PATH = @"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\msedge.exe";
         private const string EDGE_EXE = "msedge.exe";
         private const string ER_FLAG = "--edge-remover";
+        private static string Lock => Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "edge-remover.lock");
         private static readonly string[] IGNORED_FLAGS = new string[] { "--single-argument" };
 
         static void Main(string[] args)
@@ -60,7 +61,7 @@ namespace EdgeRemover
                         MessageBox.Show("Microsoft Edge won't be called in your system.", "EdgeRemover", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         Environment.Exit(1);
                     }
-                    else if (args.Contains(ER_FLAG) || DateTime.Now - Settings.Default.LastCall < TimeSpan.FromSeconds(1))
+                    else if (args.Contains(ER_FLAG) || DateTime.Now - ReadLastCall() < TimeSpan.FromSeconds(1))
                     {
                         // this is a loopback
                         MessageBox.Show("This file is set to be opened with Edge, which is blocked.\nTry another app.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -100,8 +101,23 @@ namespace EdgeRemover
 
         static void Open(string file, string extraArg)
         {
-            Settings.Default.LastCall = DateTime.Now;
-            Settings.Default.Save();
+            var timeInstant = DateTime.Now.ToString();
+            if (!File.Exists(Lock))
+            {
+                try
+                {
+                    using (var writer = new StreamWriter(File.Create(Lock)))
+                    {
+                        writer.WriteLine(timeInstant);
+                    }
+                } 
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            } else {
+                File.WriteAllText(Lock, timeInstant);
+            }
 
             var process = new ProcessStartInfo()
             {
@@ -109,6 +125,16 @@ namespace EdgeRemover
                 Arguments = extraArg
             };
             Process.Start(process);
+        }
+
+        private static DateTime ReadLastCall()
+        {
+            if (!File.Exists(Lock))
+            {
+                throw new FileNotFoundException(Lock);
+            }
+            var str = File.ReadAllText(Lock);
+            return DateTime.Parse(str);
         }
 
         static bool IsUserAdmin()
